@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Сброс пароля</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+    }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 40px 30px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #1e293b;
+    }
+    p {
+      color: #64748b;
+      font-size: 14px;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+    .btn {
+      background: #249af3;
+      color: #fff;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn:hover {
+      background: #1C85D5;
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .status {
+      margin: 20px 0;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .status.loading {
+      color: #64748b;
+    }
+    .status.success {
+      color: #10b981;
+    }
+    .status.error {
+      color: #ef4444;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1 id="heading">Откройте расширение</h1>
+      <p id="description">Подождите, выполняется переход...</p>
+      <div id="status" class="status loading"></div>
+      <button id="open-btn" class="btn" style="display:none;" onclick="openExtension()">Открыть расширение</button>
+    </div>
+  </div>
+
+  <script>
+    const EXTENSION_ID = 'oabnpfjghibhokjhogflccjonnjhdfhm';
+    const EXTENSION_URL = `chrome-extension://${EXTENSION_ID}/auth.html`;
+    
+    function updateUI(message, status = 'loading') {
+      const heading = document.getElementById('heading');
+      const description = document.getElementById('description');
+      const statusEl = document.getElementById('status');
+      const openBtn = document.getElementById('open-btn');
+      
+      heading.textContent = message;
+      
+      if (status === 'loading') {
+        statusEl.textContent = 'Попытка автоматического открытия...';
+        statusEl.className = 'status loading';
+        openBtn.style.display = 'none';
+      } else if (status === 'manual') {
+        description.textContent = 'Нажмите кнопку ниже, чтобы завершить действие в расширении.';
+        statusEl.textContent = '';
+        openBtn.style.display = 'inline-block';
+      } else if (status === 'error') {
+        description.textContent = message;
+        statusEl.textContent = 'Не удалось открыть расширение автоматически. Откройте его вручную и войдите.';
+        statusEl.className = 'status error';
+        openBtn.style.display = 'inline-block';
+      }
+    }
+    
+    function openExtension() {
+      try {
+        const params = location.hash || location.search || '';
+        const targetUrl = `${EXTENSION_URL}#/auth/reset${params}`;
+        location.href = targetUrl;
+      } catch (e) {
+        console.error('Failed to open extension:', e);
+        updateUI('Ссылка недействительна или устарела. Запросите новую.', 'error');
+      }
+    }
+    
+    // Пытаемся автоматически открыть расширение
+    setTimeout(() => {
+      try {
+        openExtension();
+        
+        // Если через 500мс мы все еще на странице, значит авто-открытие не сработало
+        setTimeout(() => {
+          // Проверяем, остались ли мы на странице
+          if (document.visibilityState !== 'hidden') {
+            updateUI('Откройте расширение', 'manual');
+          }
+        }, 500);
+      } catch (e) {
+        console.error('Auto-open failed:', e);
+        updateUI('Откройте расширение', 'manual');
+      }
+    }, 0);
+  </script>
+</body>
+</html>
