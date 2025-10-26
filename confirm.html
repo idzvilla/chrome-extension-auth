@@ -80,7 +80,7 @@
       <h1 id="heading">Откройте расширение</h1>
       <p id="description">Подождите, выполняется переход...</p>
       <div id="status" class="status loading"></div>
-      <button id="open-btn" class="btn" style="display:none;" onclick="openExtension()">Открыть расширение</button>
+      <button id="open-btn" class="btn" style="display:none;">Открыть расширение</button>
     </div>
   </div>
 
@@ -114,32 +114,48 @@
     
     function openExtension() {
       try {
-        const params = location.hash || location.search || '';
+        // Извлекаем параметры из hash (они приходят после #)
+        let params = '';
+        if (location.hash) {
+          params = location.hash;
+        } else if (location.search) {
+          params = location.search;
+        }
+        
+        // Формируем URL с параметрами
         const targetUrl = `${EXTENSION_URL}#/auth/confirm${params}`;
-        location.href = targetUrl;
+        
+        // Используем window.open вместо location.href для явного user activation
+        window.open(targetUrl, '_blank');
       } catch (e) {
         console.error('Failed to open extension:', e);
         updateUI('Ссылка недействительна или устарела. Запросите новую.', 'error');
       }
     }
     
-    // Пытаемся автоматически открыть расширение
-    setTimeout(() => {
+    // Показываем кнопку и устанавливаем обработчик
+    const openBtn = document.getElementById('open-btn');
+    openBtn.style.display = 'inline-block';
+    
+    openBtn.addEventListener('click', function() {
       try {
-        openExtension();
-        
-        // Если через 500мс мы все еще на странице, значит авто-открытие не сработало
-        setTimeout(() => {
-          // Проверяем, остались ли мы на странице
-          if (document.visibilityState !== 'hidden') {
-            updateUI('Откройте расширение', 'manual');
-          }
-        }, 500);
+        let params = location.hash || location.search || '';
+        const targetUrl = `${EXTENSION_URL}#/auth/confirm${params}`;
+        // Пробуем window.open
+        const opened = window.open(targetUrl);
+        if (!opened) {
+          // Если не открылось, пробуем location.href
+          location.href = targetUrl;
+        }
       } catch (e) {
-        console.error('Auto-open failed:', e);
-        updateUI('Откройте расширение', 'manual');
+        updateUI('Не удалось открыть расширение. Откройте его вручную и войдите.', 'error');
       }
-    }, 0);
+    });
+    
+    // Также пробуем авто-открытие с небольшой задержкой
+    setTimeout(() => {
+      openBtn.click();
+    }, 100);
   </script>
 </body>
 </html>
