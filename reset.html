@@ -114,7 +114,16 @@
     
     function openExtension() {
       try {
-        const params = location.hash || location.search || '';
+        // Извлекаем параметры из hash (они приходят после #)
+        let params = '';
+        if (location.hash) {
+          // Если hash существует, берем его без первого #
+          params = location.hash;
+        } else if (location.search) {
+          // Если есть query параметры, используем их
+          params = location.search;
+        }
+        
         const targetUrl = `${EXTENSION_URL}#/auth/reset${params}`;
         location.href = targetUrl;
       } catch (e) {
