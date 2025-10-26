@@ -40,7 +40,7 @@
     }
     .btn {
       background: #249af3;
-      color: #fff;
+      color: #fff !important;
       border: none;
       padding: 12px 24px;
       border-radius: 6px;
@@ -54,6 +54,22 @@
     .btn:hover {
       background: #1C85D5;
     }
+    .info {
+      background: #f0f9ff;
+      border: 1px solid #bae6fd;
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 24px;
+      font-size: 13px;
+      color: #0369a1;
+      text-align: left;
+    }
+    .info code {
+      background: rgba(0,0,0,0.05);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
   </style>
 </head>
 <body>
@@ -62,33 +78,29 @@
       <h1>Откройте расширение</h1>
       <p>Нажмите кнопку ниже, чтобы завершить сброс пароля в расширении.</p>
       <a id="open-link" class="btn">Открыть расширение</a>
+      <div class="info">
+        Если кнопка не работает, вручную откройте расширение и войдите на страницу настроек.
+      </div>
     </div>
   </div>
 
   <script>
-    (function() {
-      const EXTENSION_ID = 'oabnpfjghibhokjhogflccjonnjhdfhm';
-      
-      // Получаем параметры из URL
-      let params = '';
-      if (location.hash) {
-        params = location.hash;
-      } else if (location.search) {
-        params = '?' + location.search.substring(1);
-      }
-      
-      // Формируем URL расширения
-      const extensionUrl = `chrome-extension://${EXTENSION_ID}/auth.html#/auth/reset${params}`;
-      
-      // Устанавливаем ссылку на кнопку
-      const link = document.getElementById('open-link');
-      link.href = extensionUrl;
-      
-      // Пытаемся авто-открытие через небольшой setTimeout
-      setTimeout(() => {
-        window.location.href = extensionUrl;
-      }, 100);
-    })();
+    const EXTENSION_ID = 'oabnpfjghibhokjhogflccjonnjhdfhm';
+    
+    // Получаем параметры из URL
+    let params = '';
+    if (location.hash) {
+      params = location.hash;
+    } else if (location.search) {
+      params = '?' + location.search.substring(1);
+    }
+    
+    // Формируем URL расширения
+    const extensionUrl = `chrome-extension://${EXTENSION_ID}/auth.html#/auth/reset${params}`;
+    
+    // Устанавливаем ссылку
+    const link = document.getElementById('open-link');
+    link.href = extensionUrl;
   </script>
 </body>
 </html>
